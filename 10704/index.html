@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh_Hant">
+<head>
+	<meta charset="utf-8">
+	<title>列表</title>
+	<style type="text/css">
+	
+	
+	
+	
+	</style>
+	<script type="text/javascript">
+	
+	function showNode(id){
+		var x = document.getElementById(id)
+		x.style.display = "";
+	}
+	
+	function hideNode(id){
+		var x = document.getElementById(id)
+		x.style.display = "none";
+	}
+	
+	
+	</script>
+</head>
+<body>
+
+	<button id="show_add_btn">新增</button> 
+
+	<table id="list">
+	</table>
+	
+	<div id="edit_form">
+		<input type="hidden" id="ppid">
+		請輸入商品 : <input type="text" id="prod"><br>
+		請輸入金額 : <input type="text" id="price"><br>
+		<button id="add_btn">新增</button> 
+		<button id="update_btn">儲存編輯</button>
+		<button id="cancel_btn">取消</button>	
+	</div>
+
+	<script type="text/javascript">
+	(function(){
+	hideNode("edit_form");
+	
+	var x;
+	x = document.getElementById("show_add_btn")
+	x.addEventListener("click",function(){
+	showNode("edit_form");
+	});
+	x = document.getElementById("cancel_btn");
+	x.addEventListener("click", function(){
+	hideNode("edit_form");
+	});
+
+	})();
+
+	</script>
+</body>
+</html>
