@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh_Hant">
+<head>
+	<meta charset="utf-8">
+	<title>列表</title>
+	<style type="text/css">
+	
+	
+	
+	</style>
+	<script type="text/javascript">
+	
+function showNode(id){
+	var x = document.getElementById(id);
+	x.style.display = "";
+}
+
+function hideNode(id){
+	var x = document.getElementById(id);
+	x.style.display = "none";
+}
+
+//把表單的資料，送到伺服器上新增儲存
+function add2Server(){
+	
+	//建立一個要發送到伺服器的資料物件 { } JSON
+	var data = {
+		prod: document.getElementById("prod").value,
+		price: document.getElementById("price").value
+	};
+	//console.log( data );
+	
+	// AJAX請求
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", "add.php");    //發送對象 add.php
+	xhr.setRequestHeader("Content-Type","application/json;charset=UTF-8");
+	xhr.onreadystatechange = function(){
+		if( this.readyState == 4 ){ //回傳結束了
+			if( this.status == 201 ){ //正確
+				console.log( this.responseText ); //不做任何處理
+				
+				hideNode("edit_form");
+				insert2List(JSON.prase(this.responseText)); //新增到list
+				showNode("show_add_btn");
+			}else{ //錯誤
+				console.log( this.responseText ); //不做任何處理
+				alert('新增失敗');
+			}
+		}
+	};
+	xhr.send( JSON.stringify(data) );
+}
+//--------------------------------------------------
+//取得遠端資料表
+function getList(){
+	//AJAX請求
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET","list.php");
+	xhr.onreadystatechange = function(){
+		if (this.readyState ==4){//回傳結束了
+			if(this.status ==200){//正確
+				//console.log(this.responseText);//不做任何處理
+				var all = JSON.parse(this.responseText);
+				for(var i=0; i<all.length; i++){
+					insert2List(all[i]);
+					}
+			}else{
+				console.log(this.responseText);//不做任何處理
+			}
+		}
+	};
+	xhr.send();
+
+}
+//--------------------------------------------------
+
+//把一筆資料加到清單表格中
+//傳入的參數{"prod":"hb kj","price":"1","id":"16"}
+function insert2List( data ){
+	var tb1 = document.getElementById('list');
+	var row = tb1.insertRow( tb1.rows.length);	
+	var ce1,ce2,ce3;
+	ce1 = row.insertCell(0);
+	ce1 = row.insertCell(1);
+	ce1 = row.insertCell(2);
+	
+	ce1.appendChild( document.createTextNode(data.prod));
+	ce2.appendChild( document.createTextNode(data.price));
+	
+	var btn1,btn2;
+	btn1 = document.createElement('button');
+	btn1.setAttribute('t_id', data.id);
+	btn1.addEventListener('click',del_click); //<-------------刪除按鈕的動作
+	btn1.appendChild( document.createTextNode('刪除'));
+	
+	btn2 = document.createElement('button');
+	btn2.setAttribute('t_id', data.id);
+	btn2.appendChild( document.createTextNode('修改'));
+	
+	
+
+	ce3.appendChild(btn1);
+	ce3.appendChild(btn2);
+}
+	
+//--------------------------------------------------
+//刪除按鈕的動作
+function del_click(ev){
+	//確認誰被點了刪除 ev.target
+	//建立一個要發送到伺服器的資料物件 { } JSON
+	var data = {
+		id: ev.target.getAttribute('t_id')
+		};
+	console.log(data.id);
+	//發出刪除請求
+	// AJAX請求
+	var xhr = new XMLHttpRequest();
+	xhr.open("POST", "del.php");    //發送對象 add.php
+	xhr.setRequestHeader("Content-Type","application/json;charset=UTF-8");
+	xhr.onreadystatechange = function(){
+		if( this.readyState == 4 ){ //回傳結束了
+			if( this.status == 200 ){ //正確
+				console.log( this.responseText ); //不做任何處理
+			}else{ //錯誤
+				console.log( this.responseText ); //不做任何處理
+				alert('新增失敗');
+			}
+		}
+	};
+	xhr.send( JSON.stringify(data) );
+	
+		//刪除成功後
+		//從畫面上把刪除的資料拿掉
+}
+	
+	
+	
+	
+	
+	</script>
+</head>
+<body>
+
+	<button id="show_add_btn">新增</button>
+
+	<table id="list">
+	</table>
+	
+	<div id="edit_form">
+		<input type="hidden" id="ppid">
+		請輸入商品：<input type="text" id="prod">
+		金額：<input type="text" id="price">
+		<button id="add_btn">新增</button>
+		<button id="update_btn">儲存編輯</button>
+		<button id="cancel_btn">取消</button> 
+	</div>
+
+	<script type="text/javascript">
+(function() {
+	//預設隱藏編輯表單
+	hideNode("edit_form");
+	var x;
+	//設定點擊「新增」按鈕時的動作(顯示新增的編輯表單)
+	x = document.getElementById("show_add_btn");
+	x.addEventListener("click", function() {
+		showNode("edit_form");
+		hideNode("update_btn");
+		hideNode("show_add_btn");
+	});
+	//設定點擊「取消」按鈕時的動作
+	var y;
+	y = document.getElementById("cancel_btn");
+	y.addEventListener("click", function() {
+		hideNode("edit_form");
+		showNode("show_add_btn");
+	});
+	//設定點擊「新增」到資料庫按鈕時的動作
+	document.getElementById("add_btn")
+			.addEventListener("click", add2Server);
+	//取得遠端資料
+	getList();
+	
+})();
+	</script>
+</body>
+</html>
